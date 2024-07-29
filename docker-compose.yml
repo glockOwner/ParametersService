@@ -1,0 +1,28 @@
+services:
+    parameters-nginx:
+        image: nginx:stable-alpine
+        depends_on:
+            - parameters-php
+        volumes:
+            - ./nginx/conf:/etc/nginx/conf.d/
+            - ./:/var/www/parameters-crud
+        ports:
+            - "8072:80"
+    parameters-php:
+        build: .
+        container_name: parameters-php
+        volumes:
+            - ./:/var/www/parameters-crud
+        depends_on:
+            - parameters-mysql
+    parameters-mysql:
+        restart: always
+        container_name: parameters-mysql
+        image: mysql:latest
+        ports:
+            - "3312:3306"
+        environment:
+            - MYSQL_DATABASE=parameters
+            - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+        volumes:
+            - ./db-data:/var/lib/mysql
